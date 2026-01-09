@@ -1,17 +1,67 @@
-# Python
+# --- PYTHON ---
 __pycache__/
-*.pyc
+*.py[cod]
 *.pyo
 *.pyd
-env/
+*.pdb
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.log
+*.sqlite3
+
+# Virtual environments
 venv/
-*.env
+env/
+.venv/
+ENV/
 
-# Java
+# PyInstaller
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter
+.ipynb_checkpoints/
+
+# IPython
+profile_default/
+ipython_config.py
+
+# --- JAVA ---
 *.class
-target/
-
-# IDE
-.vscode/
-.idea/
+*.jar
+*.war
+*.ear
 *.iml
+target/
+out/
+
+# Maven
+.mvn/
+.settings/
+dependency-reduced-pom.xml
+
+# Gradle
+.gradle/
+build/
+
+# --- IDE / EDITORS ---
+# VS Code
+.vscode/
+.history/
+
+# PyCharm / IntelliJ
+.idea/
+*.iws
+*.ipr
+*.iml
+
+# Eclipse
+.project
+.classpath
+.settings/

@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+env/
+venv/
+*.env
+
+# Java
+*.class
+target/
+
+# IDE
+.vscode/
+.idea/
+*.iml

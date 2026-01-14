@@ -65,3 +65,7 @@ build/
 .project
 .classpath
 .settings/
+
+# environmental variables
+.env
+.ENV

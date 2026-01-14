@@ -1,4 +1,3 @@
-from api.config.settings import settings
 from fastapi.security import OAuth2PasswordBearer
 
 ALGORITHM = "HS256"

@@ -8,6 +8,8 @@ from api.config.security import ALGORITHM, oauth2_scheme
 from api.config.settings import settings
 from api.services.user_service import get_user, db
 
+SECRET_KEY = settings.SECRET_KEY.get_secret_value()
+
 
 async def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
@@ -15,7 +17,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme)):
                                           headers={"WWW-Authenticate": "Bearer"
                                                    })
     try:
-        payload = jwt.decode(token, settings.SECRET_KEY,
+        payload = jwt.decode(token, SECRET_KEY,
                              algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:

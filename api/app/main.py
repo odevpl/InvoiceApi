@@ -1,11 +1,12 @@
 from fastapi import FastAPI
 from sqlalchemy import text
 from contextlib import asynccontextmanager
+from asgi_correlation_id import CorrelationIdMiddleware
+
 from api.config.db import engine
 from api.routes import health, auth, protected
-
-from api.middlewares.logging import logging_middleware
-from starlette.middleware.base import BaseHTTPMiddleware
+from api.utils.logger import logger
+from api.middlewares.logging import LoggingMiddleware
 
 
 @asynccontextmanager
@@ -13,17 +14,23 @@ async def lifespan(app: FastAPI):
     try:
         with engine.connect() as conn:
             conn.execute(text("SELECT 1"))
-        print("Database connection OK")
+        print("Database connection OK")  # print to console
+        logger.info("Database connection OK")  # print to log
+
     except Exception as e:
-        print("Database connection FAILED:", e)
+        print("Database connection FAILED:", e)  # print to console
+        logger.error("Database connection FAILED:",
+                     exc_info=True)  # print to log
         raise e
 
     yield
 
 app = FastAPI(title="Invoice API", lifespan=lifespan)
+logger.info("Application startup complete")
 
 # Add middleware for logging
-app.add_middleware(BaseHTTPMiddleware, dispatch=logging_middleware)
+app.add_middleware(CorrelationIdMiddleware)
+app.add_middleware(LoggingMiddleware)
 
 # Add routers
 app.include_router(health.router)

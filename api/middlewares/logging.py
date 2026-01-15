@@ -1,56 +1,59 @@
 import time
-from fastapi import Request
 from http import HTTPStatus
 from api.utils.logger import logger
 
 
-async def logging_middleware(request: Request, call_next):
-    start = time.perf_counter()
+class LoggingMiddleware:
+    def __init__(self, app):
+        self.app = app
 
-    # Exclude favicon
-    if request.url.path == "/favicon.ico":
-        return await call_next(request)
+    async def __call__(self, scope, receive, send):
+        if scope["type"] != "http":
+            await self.app(scope, receive, send)
+            return
 
-    try:
-        response = await call_next(request)
-        duration_ms = round((time.perf_counter() - start) * 1000, 2)
-        status = HTTPStatus(response.status_code)
+        path = scope["path"]
+        method = scope["method"]
 
-        log_extra = {
-            "req": {
-                "method": request.method,
-                "path": request.url.path,
-            },
-            "res": {
-                "status_code": status.value,
-                "status_text": status.phrase,
-                "duration_ms": duration_ms,
-            },
-        }
+        if path == "/favicon.ico":
+            await self.app(scope, receive, send)
+            return
 
-        message = f"{status.value} {status.phrase}"
+        start = time.perf_counter()
+        status_code = 500
 
-        if status.value >= 500:
-            logger.error(message, extra=log_extra)
-        elif status.value >= 400:
-            logger.warning(message, extra=log_extra)
-        else:
-            logger.info(message, extra=log_extra)
+        async def send_wrapper(message):
+            nonlocal status_code
+            if message["type"] == "http.response.start":
+                status_code = message["status"]
+            await send(message)
 
-        return response
+        try:
+            await self.app(scope, receive, send_wrapper)
+            duration_ms = round((time.perf_counter() - start) * 1000, 2)
+            status = HTTPStatus(status_code)
 
-    except Exception:
-        duration_ms = round((time.perf_counter() - start) * 1000, 2)
-        log_extra = {
-            "req": {
-                "method": request.method,
-                "path": request.url.path,
-            },
-            "res": {
-                "status_code": 500,
-                "status_text": "Internal Server Error",
-                "duration_ms": duration_ms,
-            },
-        }
-        logger.error("Unhandled exception", extra=log_extra, exc_info=True)
-        raise
+            logger_method = logger.info
+            if status_code >= 500:
+                logger_method = logger.error
+            elif status_code >= 400:
+                logger_method = logger.warning
+
+            logger_method(
+                f"{status.value} {status.phrase}",
+                extra={
+                    "req": {"method": method, "path": path},
+                    "res": {"status_code": status.value, "status_text": status.phrase, "duration_ms": duration_ms},
+                },
+            )
+        except Exception:
+            duration_ms = round((time.perf_counter() - start) * 1000, 2)
+            logger.error(
+                "Unhandled exception",
+                extra={
+                    "req": {"method": method, "path": path},
+                    "res": {"status_code": 500, "status_text": "Internal Server Error", "duration_ms": duration_ms},
+                },
+                exc_info=True
+            )
+            raise

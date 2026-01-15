@@ -1,17 +1,13 @@
 import logging
 from logging.handlers import TimedRotatingFileHandler
-from pathlib import Path
 import json
-
 from api.config.settings import settings
+from asgi_correlation_id import correlation_id
 
-
-LOG_DIR_PATH = Path(settings.LOG_DIR)
-LOG_DIR_PATH.mkdir(parents=True, exist_ok=True)
-LOG_FILE = LOG_DIR_PATH / "api.json"
-
-LOG_LEVEL = settings.LOG_LEVEL
+LOG_DIR_PATH = settings.LOG_DIR
+LOG_FILE = f"{LOG_DIR_PATH}/api.json"
 BACKUP_COUNT = settings.LOG_BACKUP_COUNT
+LOG_LEVEL = settings.LOG_LEVEL
 
 
 class JsonFormatter(logging.Formatter):
@@ -22,13 +18,13 @@ class JsonFormatter(logging.Formatter):
             "message": record.getMessage(),
         }
 
-        # structured extras
+        # Get correlation_id from ContextVar
+        log["correlation_id"] = correlation_id.get() or "-"
+
         if hasattr(record, "req"):
             log["req"] = record.req
         if hasattr(record, "res"):
             log["res"] = record.res
-
-        # exception if exists
         if record.exc_info:
             log["exception"] = self.formatException(record.exc_info)
 
@@ -43,7 +39,8 @@ file_handler = TimedRotatingFileHandler(
     when="midnight",
     interval=1,
     backupCount=BACKUP_COUNT,
-    encoding="utf-8")
+    encoding="utf-8"
+)
 file_handler.setFormatter(JsonFormatter())
 logger.addHandler(file_handler)
 logger.propagate = False

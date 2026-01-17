@@ -69,3 +69,7 @@ build/
 # environmental variables
 .env
 .ENV
+
+# Logs
+logs/*
+!logs/.gitkeep

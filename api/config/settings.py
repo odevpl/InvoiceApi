@@ -16,6 +16,11 @@ class Settings(BaseSettings):
     DB_PASSWORD: str
     DB_NAME: str
 
+    # Logs
+    LOG_LEVEL: str = "INFO"
+    LOG_DIR: str
+    LOG_BACKUP_COUNT: int = 14
+
     @computed_field
     def DATABASE_URL(self) -> str:
         return (

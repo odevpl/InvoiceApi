@@ -3,7 +3,7 @@ from sqlalchemy import text
 from contextlib import asynccontextmanager
 from asgi_correlation_id import CorrelationIdMiddleware
 
-from api.config.db import engine
+from api.config.db import Base, engine
 from api.routes import health, auth, protected
 from api.utils.logger import logger
 from api.middlewares.logging import LoggingMiddleware
@@ -37,3 +37,6 @@ app.add_middleware(LoggingMiddleware)
 app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(protected.router)
+
+# Temporary solution before Alembic
+Base.metadata.create_all(bind=engine)

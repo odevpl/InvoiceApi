@@ -22,11 +22,12 @@ async def lifespan(app: FastAPI):
         logger.error("Database connection FAILED:",
                      exc_info=True)  # print to log
         raise e
-
+    logger.info("Application startup complete")
     yield
+    logger.info("Application shutdown complete")
 
 app = FastAPI(title="Invoice API", lifespan=lifespan)
-logger.info("Application startup complete")
+
 
 # Add middleware for logging
 app.add_middleware(CorrelationIdMiddleware)

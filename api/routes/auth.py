@@ -2,13 +2,16 @@ from fastapi import APIRouter
 from fastapi.security import OAuth2PasswordRequestForm
 from fastapi import Depends, HTTPException, status
 from jose import jwt, JWTError
+from sqlalchemy.orm import Session
 
 from api.services.token_service import create_access_token
-from api.services.user_service import authenticate_user
+from api.services.user_service import authenticate_user, create_user, get_user, db
 from api.models.token import Token, RefreshTokenRequest, AccessTokenResponse
-from api.services.user_service import get_user, db
+from api.models.user import RegisterRequest, RegisterResponse
+from api.services.user_service import get_user
 from api.config.security import ALGORITHM
 from api.config.settings import settings
+from api.config.db import get_db
 
 router = APIRouter()
 
@@ -43,3 +46,18 @@ async def refresh_access_token(request: RefreshTokenRequest):
         raise HTTPException(status_code=401, detail="Invalid user")
     new_access_token = create_access_token(data={"sub": user.username})
     return AccessTokenResponse(access_token=new_access_token)
+
+@router.post( 
+    "/auth/register", 
+    status_code=status.HTTP_201_CREATED, 
+    response_model=RegisterResponse, 
+) 
+def register_user(payload: RegisterRequest, db: Session = Depends(get_db)): 
+    user = create_user( 
+        db=db, 
+        username=payload.username, 
+        email=payload.email, 
+        password=payload.password, 
+    )
+    
+    return user

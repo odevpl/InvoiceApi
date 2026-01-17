@@ -12,7 +12,41 @@ GET /health
 { "status": "ok" }
 ```
 
-### 2. Login
+### 2. Register (New user)
+```bash
+POST /auth/register
+```
+
+- Body: application/json
+
+  { 
+    "username": "string", 
+    "email": "string", 
+    "password": "string", 
+    "confirm_password": "string" 
+  }
+
+- Response: 201 Created
+```json
+{
+  "id": 1, 
+  "email": "user@example.com", 
+  "role": "user"
+}
+```
+
+- Notes:
+
+- email must be a valid email format
+
+- password must have at least 8 characters
+
+- password and confirm_password must match
+
+- username and email must be unique
+
+
+### 3. Login
 ```bash
 POST /auth/login
 ```
@@ -37,7 +71,7 @@ POST /auth/login
     
     Passwords are hashed using bcrypt
 
-### 3. Refresh token
+### 4. Refresh token
 ```bash
 POST /auth/refresh
 ```
@@ -62,7 +96,7 @@ POST /auth/refresh
 
     Stateless – server does not store tokens
 
-### 4. Protected endpoint
+### 5. Protected endpoint
 ```bash
 GET /protected
 ```

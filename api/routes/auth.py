@@ -49,17 +49,18 @@ async def refresh_access_token(request: RefreshTokenRequest):
     new_access_token = create_access_token(data={"sub": user.username})
     return AccessTokenResponse(access_token=new_access_token)
 
-@router.post( 
-    "/auth/register", 
-    status_code=status.HTTP_201_CREATED, 
-    response_model=RegisterResponse, 
-) 
-def register_user(payload: RegisterRequest, db: Session = Depends(get_db)): 
-    user = create_user( 
-        db=db, 
-        username=payload.username, 
-        email=payload.email, 
-        password=payload.password, 
+
+@router.post(
+    "/register",
+    status_code=status.HTTP_201_CREATED,
+    response_model=RegisterResponse,
+)
+def register_user(payload: RegisterRequest, db: Session = Depends(get_db)):
+    user = create_user(
+        db=db,
+        username=payload.username,
+        email=payload.email,
+        password=payload.password,
     )
-    
+
     return user

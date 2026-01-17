@@ -13,10 +13,12 @@ from api.config.security import ALGORITHM
 from api.config.settings import settings
 from api.config.db import get_db
 
-router = APIRouter()
+router = APIRouter(
+    prefix="/auth",
+    tags=["auth"],)
 
 
-@router.post("/auth/login", response_model=Token)
+@router.post("/login", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -30,7 +32,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
     return Token(access_token=access_token)
 
 
-@router.post("/auth/refresh", response_model=AccessTokenResponse)
+@router.post("/refresh", response_model=AccessTokenResponse)
 async def refresh_access_token(request: RefreshTokenRequest):
     try:
         payload = jwt.decode(request.refresh_token,

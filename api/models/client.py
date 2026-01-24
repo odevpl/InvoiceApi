@@ -2,9 +2,7 @@ import re
 from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from api.config.db import Base
 
 
 class ClientCreate(BaseModel):

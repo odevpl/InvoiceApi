@@ -49,3 +49,10 @@ class ClientRead(ClientCreate):
 
 class ClientNIPRequest(BaseModel):
     nip: str
+
+
+class ClientListResponse(BaseModel): 
+    total: int 
+    limit: int 
+    offset: int 
+    items: list[ClientRead]

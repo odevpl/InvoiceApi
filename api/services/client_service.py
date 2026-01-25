@@ -31,5 +31,19 @@ def add_client(db: Session, client_data: ClientCreate, owner_id: int) -> Client:
     return client
 
 
-def list_clients (db: Session, owner_id: int) -> list[Client]: 
-    return db.query(Client).filter(Client.owner_id == owner_id).all()
+def list_clients(
+    db: Session,
+    owner_id: int,
+    limit: int = 20,
+    offset: int = 0
+):
+    query = (
+        db.query(Client)
+        .filter(Client.owner_id == owner_id, Client.active == True)
+        .order_by(Client.name.asc())
+    )
+
+    total = query.count()
+    clients = query.offset(offset).limit(limit).all()
+
+    return clients, total

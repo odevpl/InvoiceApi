@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, status
 from sqlalchemy.orm import Session
 
 from api.config.db import get_db
-from api.models.user import User
-from api.models.client import ClientListResponse, ClientRead
+from api.models.db_user import UserDB
+from api.models.client import ClientListResponse
 from api.services.client_service import list_clients
 from api.services.auth_service import get_current_active_user
 
@@ -32,7 +32,7 @@ def get_clients(
     limit: int = 20,
     offset: int = 0,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: UserDB = Depends(get_current_active_user),
 ):
     clients, total = list_clients(
         db=db,

@@ -1,8 +1,7 @@
 import re
 from typing import Optional
 from pydantic import BaseModel, EmailStr, field_validator
-from api.config.db import Base
-from api.models.db_client import Client
+
 
 class ClientCreate(BaseModel):
     name: str

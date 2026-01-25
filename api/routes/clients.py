@@ -2,7 +2,7 @@ from fastapi import Depends, APIRouter, status, HTTPException
 from sqlalchemy.orm import Session
 
 from api.config.db import get_db
-from api.models.user import User
+from api.models.db_user import UserDB
 from api.services.auth_service import get_current_active_user
 from api.services.client_service import add_client
 from api.models.client import ClientCreate, ClientRead, ClientNIPRequest
@@ -32,7 +32,7 @@ Create a new client.
 async def create_client(
     client: ClientCreate,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: UserDB = Depends(get_current_active_user),
 ):
     try:
         db_client = add_client(db, client, owner_id=current_user.id)
@@ -59,7 +59,7 @@ Create a new client by providing only the NIP number.
 async def create_client_by_nip(
     request_data: ClientNIPRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_active_user),
+    current_user: UserDB = Depends(get_current_active_user),
 ):
     nip = request_data.nip.replace("-", "").strip()
     date = datetime.date.today().strftime("%Y-%m-%d")

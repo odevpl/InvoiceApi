@@ -11,7 +11,5 @@ class Client(Base):
     address = Column(String)
     nip = Column(String, nullable=False, unique=True, index=True)
     accountNumber = Column(String, nullable=True)
-    active = Column(Boolean, default=True)
-
 
     owner_id = Column(ForeignKey("users.id"), nullable=False)

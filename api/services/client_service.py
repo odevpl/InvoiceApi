@@ -39,7 +39,7 @@ def list_clients(
 ):
     query = (
         db.query(Client)
-        .filter(Client.owner_id == owner_id, Client.active == True)
+        .filter(Client.owner_id == owner_id)
         .order_by(Client.name.asc())
     )
 

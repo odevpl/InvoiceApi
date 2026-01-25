@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 from asgi_correlation_id import CorrelationIdMiddleware
 
 from api.config.db import Base, engine
-from api.routes import health, auth, protected, clients
+from api.routes import health, auth, protected, clients, clients_list
 from api.utils.logger import logger
 from api.middlewares.logging import LoggingMiddleware
 
@@ -39,6 +39,8 @@ app.include_router(health.router)
 app.include_router(auth.router)
 app.include_router(protected.router)
 app.include_router(clients.router)
+app.include_router(clients_list.router)
+
 
 # Temporary solution before Alembic
 Base.metadata.create_all(bind=engine)

@@ -1,19 +1,35 @@
-from api.models.client import Client, ClientCreate
+from sqlalchemy.orm import Session 
+from fastapi import HTTPException, status
 
-# Fake in-memory DB
-db_clients: list[Client] = []
+from api.models.db_client import Client
+from api.models.client import ClientCreate
 
 
-def add_client(client_data: ClientCreate, owner_id: int) -> Client:
-    # Check if client with this NIP already exists
-    for c in db_clients:
-        if c.nip == client_data.nip:
-            raise ValueError("Client with this NIP already exists")
-    client = Client(**client_data.dict(),
-                    owner_id=owner_id, id=len(db_clients)+1)
-    db_clients.append(client)
+def add_client(db: Session, client_data: ClientCreate, owner_id: int) -> Client: 
+    # Check if client with this NIP already exists 
+    existing = db.query(Client).filter(Client.nip == client_data.nip).first() 
+    if existing: 
+        raise HTTPException( 
+        status_code=status.HTTP_400_BAD_REQUEST, 
+        detail="Client with this NIP already exists" 
+        )
+
+    client = Client( 
+        name=client_data.name, 
+        email=client_data.email, 
+        phone=client_data.phone, 
+        address=client_data.address, 
+        nip=client_data.nip, 
+        accountNumber=client_data.accountNumber, 
+        owner_id=owner_id 
+    ) 
+    
+    db.add(client) 
+    db.commit() 
+    db.refresh(client) 
+    
     return client
 
 
-def list_clients() -> list[Client]:
-    return db_clients
+def list_clients (db: Session, owner_id: int) -> list[Client]: 
+    return db.query(Client).filter(Client.owner_id == owner_id).all()

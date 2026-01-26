@@ -5,10 +5,9 @@ from jose import jwt, JWTError
 from sqlalchemy.orm import Session
 
 from api.services.token_service import create_access_token
-from api.services.user_service import authenticate_user, create_user, get_user, db
+from api.services.user_service import authenticate_user, create_user, get_user
 from api.models.token import Token, RefreshTokenRequest, AccessTokenResponse
 from api.models.user import RegisterRequest, RegisterResponse
-from api.services.user_service import get_user
 from api.config.security import ALGORITHM
 from api.config.settings import settings
 from api.config.db import get_db
@@ -19,7 +18,7 @@ router = APIRouter(
 
 
 @router.post("/login", response_model=Token)
-async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
+async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
@@ -33,7 +32,7 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 
 
 @router.post("/refresh", response_model=AccessTokenResponse)
-async def refresh_access_token(request: RefreshTokenRequest):
+async def refresh_access_token(request: RefreshTokenRequest, db: Session = Depends(get_db)):
     try:
         payload = jwt.decode(request.refresh_token,
                              settings.SECRET_KEY, algorithms=[ALGORITHM])

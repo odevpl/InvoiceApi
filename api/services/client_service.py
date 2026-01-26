@@ -1,4 +1,5 @@
-from api.models.client import Client, ClientCreate
+from api.models.client import ClientCreate
+from api.models.db_client import Client
 
 # Fake in-memory DB
 db_clients: list[Client] = []

@@ -12,6 +12,7 @@ public class HealthEndpointTest {
 
     @Test
     public void testHealthEndpoint() throws IOException {
+
         // URL of the /health endpoint
         URL url = new URL("http://127.0.0.1:8000/health");
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();

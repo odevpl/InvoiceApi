@@ -3,15 +3,17 @@ from api.models.user import UserInDB
 from api.models.token import TokenData
 from jose import jwt, JWTError
 from fastapi import Depends, HTTPException, status
+from sqlalchemy.orm import Session
 
 from api.config.security import ALGORITHM, oauth2_scheme
 from api.config.settings import settings
-from api.services.user_service import get_user, db
+from api.services.user_service import get_user
+from api.config.db import get_db
 
 SECRET_KEY = settings.SECRET_KEY.get_secret_value()
 
 
-async def get_current_user(token: str = Depends(oauth2_scheme)):
+async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     credentials_exception = HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                           detail="Could not validate credentials",
                                           headers={"WWW-Authenticate": "Bearer"

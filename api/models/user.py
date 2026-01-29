@@ -11,9 +11,9 @@ class User(BaseModel):
     role: str | None = None
     disabled: bool | None = None
 
-
-class UserInDB(User):
-    hashed_password: str
+    model_config = { 
+        "from_attributes": True # for ORM → Pydantic 
+        }
 
 
 class RegisterRequest(BaseModel):
